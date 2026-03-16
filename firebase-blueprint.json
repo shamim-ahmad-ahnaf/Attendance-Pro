@@ -1,0 +1,109 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user (Teacher/Admin)",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "teacher"] }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Class": {
+      "title": "Class",
+      "description": "A class or section",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "section": { "type": "string" },
+        "teacherId": { "type": "string" }
+      },
+      "required": ["name", "teacherId"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "A student in a class",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "roll": { "type": "string" },
+        "classId": { "type": "string" },
+        "gender": { "type": "string", "enum": ["male", "female", "other"] },
+        "fatherName": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "dob": { "type": "string", "format": "date" },
+        "photoURL": { "type": "string" }
+      },
+      "required": ["name", "roll", "classId"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Attendance record for a student on a specific date",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "classId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["present", "absent", "late"] },
+        "markedBy": { "type": "string" }
+      },
+      "required": ["studentId", "classId", "date", "status", "markedBy"]
+    },
+    "Fee": {
+      "title": "Fee",
+      "description": "Fee payment record",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "month": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["paid", "unpaid"] },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["studentId", "month", "amount", "status"]
+    },
+    "Result": {
+      "title": "Result",
+      "description": "Exam result record",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "examName": { "type": "string" },
+        "subject": { "type": "string" },
+        "marks": { "type": "number" },
+        "grade": { "type": "string" }
+      },
+      "required": ["studentId", "examName", "subject", "marks"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "Collection of system users"
+    },
+    "classes": {
+      "schema": "Class",
+      "description": "Collection of classes"
+    },
+    "students": {
+      "schema": "Student",
+      "description": "Collection of students"
+    },
+    "attendance": {
+      "schema": "Attendance",
+      "description": "Collection of attendance records"
+    },
+    "fees": {
+      "schema": "Fee",
+      "description": "Collection of fee records"
+    },
+    "results": {
+      "schema": "Result",
+      "description": "Collection of result records"
+    }
+  }
+}
