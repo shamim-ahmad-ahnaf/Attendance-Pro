@@ -39,7 +39,12 @@ import {
   Trash2,
   Edit,
   Check,
-  X
+  X,
+  BellRing,
+  Send,
+  MessageSquare,
+  Info,
+  Bell
 } from 'lucide-react';
 import { format, startOfDay, endOfDay, subDays } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
@@ -64,6 +69,9 @@ interface StudentData {
   address?: string;
   dob?: string;
   photoURL?: string;
+  parentName?: string;
+  parentPhone?: string;
+  parentEmail?: string;
 }
 
 interface FeeData {
@@ -243,7 +251,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   // but we should log it clearly.
 }
 
-const Dashboard = ({ user }: { user: any }) => {
+const Dashboard = ({ user, setActiveTab }: { user: any, setActiveTab: (tab: string) => void }) => {
   const [stats, setStats] = useState({ totalStudents: 0, presentToday: 0, absentToday: 0 });
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [trends, setTrends] = useState<{ day: string, height: number }[]>([]);
@@ -270,7 +278,10 @@ const Dashboard = ({ user }: { user: any }) => {
               name,
               roll: (100 + studentNames.indexOf(name)).toString(),
               classId: classRef.id,
-              email: `${name.toLowerCase().replace(' ', '.')}@example.com`
+              email: `${name.toLowerCase().replace(' ', '.')}@example.com`,
+              parentName: `${name.split(' ')[0]}'s Parent`,
+              parentPhone: `017${Math.floor(10000000 + Math.random() * 90000000)}`,
+              parentEmail: `${name.toLowerCase().replace(' ', '.')}@example.com`
             });
             
             // Add some attendance records for the last 7 days
@@ -381,24 +392,31 @@ const Dashboard = ({ user }: { user: any }) => {
         <p className="text-slate-500">Welcome back! Here's what's happening today.</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
           { label: 'Total Students', value: stats.totalStudents, icon: Users, color: 'bg-orange-500' },
           { label: 'Present Today', value: stats.presentToday, icon: CheckCircle2, color: 'bg-emerald-500' },
           { label: 'Absent Today', value: stats.absentToday, icon: XCircle, color: 'bg-rose-500' },
+          { label: 'Notifications', value: stats.absentToday, icon: Bell, color: 'bg-indigo-500', action: () => setActiveTab('notifications') },
         ].map((item, i) => (
           <motion.div
             key={item.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm"
+            onClick={item.action}
+            className={cn(
+              "bg-white p-6 rounded-3xl border border-slate-100 shadow-sm",
+              item.action && "cursor-pointer hover:border-indigo-200 transition-all"
+            )}
           >
             <div className="flex items-center justify-between mb-4">
               <div className={cn("p-3 rounded-2xl text-white shadow-lg", item.color)}>
                 <item.icon size={24} />
               </div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Live</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                {item.label === 'Notifications' ? 'Pending' : 'Live'}
+              </span>
             </div>
             <div className="text-4xl font-bold text-slate-900">{item.value}</div>
             <div className="text-slate-500 font-medium mt-1">{item.label}</div>
@@ -840,7 +858,10 @@ const StudentManagement = ({ user }: { user: any }) => {
     phone: '',
     address: '',
     dob: '',
-    photoURL: ''
+    photoURL: '',
+    parentName: '',
+    parentPhone: '',
+    parentEmail: ''
   });
 
   useEffect(() => {
@@ -854,7 +875,10 @@ const StudentManagement = ({ user }: { user: any }) => {
         phone: editingStudent.phone || '',
         address: editingStudent.address || '',
         dob: editingStudent.dob || '',
-        photoURL: editingStudent.photoURL || ''
+        photoURL: editingStudent.photoURL || '',
+        parentName: editingStudent.parentName || '',
+        parentPhone: editingStudent.parentPhone || '',
+        parentEmail: editingStudent.parentEmail || ''
       });
     } else {
       setNewStudent({ 
@@ -866,7 +890,10 @@ const StudentManagement = ({ user }: { user: any }) => {
         phone: '',
         address: '',
         dob: '',
-        photoURL: ''
+        photoURL: '',
+        parentName: '',
+        parentPhone: '',
+        parentEmail: ''
       });
     }
   }, [editingStudent]);
@@ -1101,6 +1128,34 @@ const StudentManagement = ({ user }: { user: any }) => {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Parent's Name</label>
+                    <input 
+                      value={newStudent.parentName}
+                      onChange={e => setNewStudent({...newStudent, parentName: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Parent's Name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Parent's Phone</label>
+                    <input 
+                      value={newStudent.parentPhone}
+                      onChange={e => setNewStudent({...newStudent, parentPhone: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Parent's Phone"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Parent's Email (Real)</label>
+                    <input 
+                      type="email"
+                      value={newStudent.parentEmail}
+                      onChange={e => setNewStudent({...newStudent, parentEmail: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="parent@example.com"
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1">Date of Birth</label>
                     <input 
                       type="date"
@@ -1202,6 +1257,10 @@ const StudentManagement = ({ user }: { user: any }) => {
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">Phone</span>
                   <span className="text-slate-900 font-bold">{selectedStudent.phone || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-medium">Parent Email</span>
+                  <span className="text-slate-900 font-bold">{selectedStudent.parentEmail || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">DOB</span>
@@ -2371,11 +2430,315 @@ const ResultManagement = ({ user }: { user: any }) => {
   );
 };
 
+const NotificationCenter = ({ user }: { user: any }) => {
+  const [students, setStudents] = useState<StudentData[]>([]);
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
+  const [classes, setClasses] = useState<ClassData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState<string | null>(null);
+  const [emailConfigured, setEmailConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkConfig = async () => {
+      try {
+        const res = await fetch('/api/email-status');
+        const data = await res.json();
+        setEmailConfigured(data.configured);
+      } catch (err) {
+        setEmailConfigured(false);
+      }
+    };
+    checkConfig();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const today = format(new Date(), 'yyyy-MM-dd');
+    
+    const unsubStudents = onSnapshot(collection(db, 'students'), (snapshot) => {
+      setStudents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as StudentData)));
+    });
+
+    const unsubAttendance = onSnapshot(
+      query(collection(db, 'attendance'), where('date', '==', today)),
+      (snapshot) => {
+        setAttendance(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AttendanceRecord)));
+        setLoading(false);
+      }
+    );
+
+    const unsubClasses = onSnapshot(collection(db, 'classes'), (snapshot) => {
+      setClasses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ClassData)));
+    });
+
+    return () => {
+      unsubStudents();
+      unsubAttendance();
+      unsubClasses();
+    };
+  }, [user]);
+
+  const sendNotification = async (student: StudentData, status: string) => {
+    if (!student.parentEmail) {
+      alert(`No email address found for ${student.name}'s parent.`);
+      return;
+    }
+
+    setSending(student.id);
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: student.parentEmail,
+          subject: `Attendance Alert: ${student.name} is ${status}`,
+          text: `Dear Parent,\n\nThis is to inform you that your child, ${student.name}, is marked as ${status} today (${format(new Date(), 'PPP')}).\n\nRegards,\nAttendance Pro Team`
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert(`Real email sent successfully to ${student.parentEmail}`);
+      } else {
+        throw new Error(data.error || 'Failed to send email');
+      }
+    } catch (error: any) {
+      console.error("Email error:", error);
+      alert(`Error: ${error.message}. (Note: Make sure you have configured SMTP in environment variables)`);
+    } finally {
+      setSending(null);
+    }
+  };
+
+  const notifyAll = async (type: 'absent' | 'late') => {
+    const targets = students.filter(s => {
+      const record = attendance.find(a => a.studentId === s.id);
+      return record?.status === type;
+    });
+
+    if (targets.length === 0) {
+      alert(`No ${type} students found for today.`);
+      return;
+    }
+
+    const withEmail = targets.filter(t => t.parentEmail);
+
+    if (confirm(`Send real emails to ${withEmail.length} parents? (${targets.length - withEmail.length} students missing email)`)) {
+      setLoading(true);
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const student of withEmail) {
+        try {
+          const response = await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: student.parentEmail,
+              subject: `Attendance Alert: ${student.name} is ${type}`,
+              text: `Dear Parent,\n\nThis is to inform you that your child, ${student.name}, is marked as ${type} today (${format(new Date(), 'PPP')}).\n\nRegards,\nAttendance Pro Team`
+            })
+          });
+          const data = await response.json();
+          if (data.success) successCount++;
+          else failCount++;
+        } catch (err) {
+          failCount++;
+        }
+      }
+      
+      setLoading(false);
+      alert(`Batch complete: ${successCount} sent, ${failCount} failed.`);
+    }
+  };
+
+  const absentStudents = students.filter(s => {
+    const record = attendance.find(a => a.studentId === s.id);
+    return record?.status === 'absent';
+  });
+
+  const lateStudents = students.filter(s => {
+    const record = attendance.find(a => a.studentId === s.id);
+    return record?.status === 'late';
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold text-slate-900">Notification Center</h2>
+          <p className="text-slate-500">Send automated alerts to parents about attendance.</p>
+        </div>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => notifyAll('absent')}
+            className="bg-rose-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-rose-200 hover:bg-rose-700 transition-all active:scale-95"
+          >
+            <BellRing size={20} />
+            Notify All Absentees
+          </button>
+          <button 
+            onClick={() => notifyAll('late')}
+            className="bg-amber-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-amber-200 hover:bg-amber-600 transition-all active:scale-95"
+          >
+            <Clock size={20} />
+            Notify All Late
+          </button>
+        </div>
+      </header>
+
+      {emailConfigured === false && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-6 bg-orange-50 border border-orange-200 rounded-3xl flex items-start gap-4"
+        >
+          <div className="p-3 bg-orange-100 rounded-2xl text-orange-600">
+            <Info size={24} />
+          </div>
+          <div>
+            <h4 className="text-lg font-bold text-orange-900">Email Service Not Configured</h4>
+            <p className="text-orange-700 mb-3">
+              To send real emails, you must set <strong>SMTP_USER</strong> and <strong>SMTP_PASS</strong> in the app settings.
+            </p>
+            <button 
+              onClick={() => alert("1. Click the gear icon (⚙️) in the sidebar.\n2. Go to 'Environment Variables'.\n3. Add SMTP_USER (your email) and SMTP_PASS (your App Password).\n4. Restart the server.")}
+              className="bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-orange-700 transition-all"
+            >
+              How to fix this?
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Absent Column */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <XCircle className="text-rose-500" />
+              Absent Today ({absentStudents.length})
+            </h3>
+          </div>
+          
+          {absentStudents.length === 0 ? (
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 text-center">
+              <CheckCircle2 size={48} className="text-emerald-500 mx-auto mb-4" />
+              <p className="text-slate-500 font-medium">Everyone is present! No notifications needed.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {absentStudents.map(student => (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  key={student.id}
+                  className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-rose-200 transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+                      {student.name[0]}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900">{student.name}</h4>
+                      <p className="text-xs text-slate-500">
+                        {classes.find(c => c.id === student.classId)?.name} • Parent: {student.parentName || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => sendNotification(student, 'absent')}
+                    disabled={sending === student.id}
+                    className="p-3 bg-slate-50 text-slate-600 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
+                  >
+                    {sending === student.id ? <div className="animate-spin h-5 w-5 border-b-2 border-current rounded-full" /> : <Send size={20} />}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Late Column */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <Clock className="text-amber-500" />
+              Late Today ({lateStudents.length})
+            </h3>
+          </div>
+
+          {lateStudents.length === 0 ? (
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 text-center">
+              <Info size={48} className="text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500 font-medium">No late entries recorded today.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {lateStudents.map(student => (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  key={student.id}
+                  className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-amber-200 transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                      {student.name[0]}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900">{student.name}</h4>
+                      <p className="text-xs text-slate-500">
+                        {classes.find(c => c.id === student.classId)?.name} • Parent: {student.parentName || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => sendNotification(student, 'late')}
+                    disabled={sending === student.id}
+                    className="p-3 bg-slate-50 text-slate-600 hover:bg-amber-50 hover:text-amber-600 rounded-xl transition-all"
+                  >
+                    {sending === student.id ? <div className="animate-spin h-5 w-5 border-b-2 border-current rounded-full" /> : <Send size={20} />}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const [firebaseUser, loading] = useAuthState(auth);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [students, setStudents] = useState<StudentData[]>([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'students'), (snapshot) => {
+      setStudents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as StudentData)));
+    });
+    return () => unsub();
+  }, []);
+
+  const filteredStudents = searchQuery.trim() 
+    ? students.filter(s => 
+        s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        s.roll.includes(searchQuery)
+      )
+    : [];
 
   const user = firebaseUser || {
     uid: 'guest-teacher',
@@ -2393,12 +2756,13 @@ export default function App() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <Dashboard user={user} />;
+      case 'dashboard': return <Dashboard user={user} setActiveTab={setActiveTab} />;
       case 'attendance': return <AttendanceMarker user={user} />;
       case 'students': return <StudentManagement user={user} />;
       case 'classes': return <ClassManagement user={user} />;
       case 'fees': return <FeeManagement user={user} />;
       case 'results': return <ResultManagement user={user} />;
+      case 'notifications': return <NotificationCenter user={user} />;
       case 'reports': return (
         <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
           <BarChart3 size={48} className="text-slate-300 mx-auto mb-4" />
@@ -2406,7 +2770,7 @@ export default function App() {
           <p className="text-slate-500">Coming soon! Detailed analytics and exportable reports.</p>
         </div>
       );
-      default: return <Dashboard user={user} />;
+      default: return <Dashboard user={user} setActiveTab={setActiveTab} />;
     }
   };
 
@@ -2444,6 +2808,7 @@ export default function App() {
           <SidebarItem icon={BookOpen} label="Classes" active={activeTab === 'classes'} isOpen={isSidebarOpen} onClick={() => { setActiveTab('classes'); if (window.innerWidth < 1024) setIsSidebarOpen(false); }} />
           <SidebarItem icon={DollarSign} label="Fees" active={activeTab === 'fees'} isOpen={isSidebarOpen} onClick={() => { setActiveTab('fees'); if (window.innerWidth < 1024) setIsSidebarOpen(false); }} />
           <SidebarItem icon={FileText} label="Results" active={activeTab === 'results'} isOpen={isSidebarOpen} onClick={() => { setActiveTab('results'); if (window.innerWidth < 1024) setIsSidebarOpen(false); }} />
+          <SidebarItem icon={Bell} label="Notifications" active={activeTab === 'notifications'} isOpen={isSidebarOpen} onClick={() => { setActiveTab('notifications'); if (window.innerWidth < 1024) setIsSidebarOpen(false); }} />
           <SidebarItem icon={BarChart3} label="Reports" active={activeTab === 'reports'} isOpen={isSidebarOpen} onClick={() => { setActiveTab('reports'); if (window.innerWidth < 1024) setIsSidebarOpen(false); }} />
         </nav>
 
@@ -2480,26 +2845,6 @@ export default function App() {
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-20">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center shadow-md shadow-orange-200 shrink-0">
-                <GraduationCap className="text-white w-5 h-5" />
-              </div>
-              <span className="font-bold text-slate-900 hidden xs:block">Attendance Pro</span>
-            </div>
-          </div>
-
-          <div className="flex-1 max-w-md mx-4">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                placeholder="Search students..."
-                className="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none transition-all"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Menu Icon moved to the right side as requested */}
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 flex flex-col items-center justify-center gap-1 transition-all active:scale-95"
@@ -2508,6 +2853,64 @@ export default function App() {
               <div className="w-6 h-0.5 bg-slate-600 rounded-full" />
               <div className="w-6 h-0.5 bg-slate-600 rounded-full" />
             </button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center shadow-md shadow-orange-200 shrink-0">
+                <GraduationCap className="text-white w-5 h-5" />
+              </div>
+              <span className="font-bold text-slate-900 hidden xs:block">Attendance Pro</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 flex-1 justify-end">
+            <div className="flex-1 max-w-md mx-4 hidden sm:block relative">
+              <div className="relative group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  placeholder="Search students..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                />
+              </div>
+
+              {/* Search Results Dropdown */}
+              <AnimatePresence>
+                {searchQuery.trim() && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50"
+                  >
+                    {filteredStudents.length === 0 ? (
+                      <div className="p-4 text-center text-slate-500 text-sm">No students found</div>
+                    ) : (
+                      <div className="max-h-64 overflow-y-auto">
+                        {filteredStudents.map(student => (
+                          <button
+                            key={student.id}
+                            onClick={() => {
+                              setSearchQuery('');
+                              setActiveTab('students');
+                              // In a real app, we'd trigger a "view student" modal here
+                            }}
+                            className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-50 last:border-0"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs">
+                              {student.name[0]}
+                            </div>
+                            <div>
+                              <div className="text-sm font-bold text-slate-900">{student.name}</div>
+                              <div className="text-[10px] text-slate-500">Roll: {student.roll}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             
             <div className="relative">
               <button 
