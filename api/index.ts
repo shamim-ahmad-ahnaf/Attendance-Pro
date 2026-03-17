@@ -50,73 +50,103 @@ app.post("/api/send-email", async (req, res) => {
       },
     });
 
-    // Vibrant Orange HTML Email Template
+    // Table-based HTML Email Template for Maximum Compatibility
     const htmlTemplate = `
-      <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #fed7aa;">
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
-          <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: inline-block; line-height: 60px; margin-bottom: 10px;">
-            <span style="font-size: 30px;">📅</span>
-          </div>
-          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Attendance Pro</h1>
-          <p style="color: #ffedd5; margin: 5px 0 0; font-size: 14px; opacity: 0.9;">Smart Attendance Management System</p>
-        </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Attendance Notification</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Helvetica, Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #fed7aa; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                
+                <!-- Header -->
+                <tr>
+                  <td align="center" bgcolor="#f97316" style="padding: 30px 20px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;">Attendance Pro</h1>
+                    <p style="color: #ffedd5; margin: 5px 0 0; font-size: 14px;">Smart Attendance Management System</p>
+                  </td>
+                </tr>
 
-        <!-- Content Body -->
-        <div style="padding: 40px 30px; background-color: #ffffff;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <span style="background-color: #fff7ed; color: #c2410c; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid #ffedd5;">
-              New Notification
-            </span>
-          </div>
+                <!-- Body -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 22px;">Attendance Notification</h2>
+                    <p style="color: #374151; font-size: 16px; margin: 0 0 15px 0;">Dear Parent,</p>
+                    <p style="color: #374151; line-height: 1.6; font-size: 16px; margin: 0 0 25px 0;">
+                      This is to inform you that your child has an attendance update. Please review the details below.
+                    </p>
 
-          <div style="color: #374151; line-height: 1.8; font-size: 16px; background: #fffaf5; padding: 25px; border-radius: 12px; border: 1px dashed #fdba74;">
-            ${text.split('\n').map(line => {
-              if (line.includes(':')) {
-                const [label, value] = line.split(':');
-                return `<p style="margin: 8px 0;"><strong style="color: #ea580c;">${label}:</strong> <span style="color: #111827; font-weight: 500;">${value}</span></p>`;
-              }
-              return `<p style="margin: 10px 0;">${line}</p>`;
-            }).join('')}
-          </div>
+                    <!-- Info Box -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff7ed; border-radius: 8px; border-left: 5px solid #f97316;">
+                      <tr>
+                        <td style="padding: 20px;">
+                          ${text.split('\n').map(line => {
+                            if (line.includes(':')) {
+                              const [label, value] = line.split(':');
+                              const isStatus = label.trim().toLowerCase() === 'status';
+                              const statusColor = value.trim().toLowerCase() === 'absent' ? '#ef4444' : '#10b981';
+                              return `
+                                <p style="margin: 8px 0; font-size: 15px; color: #4b5563;">
+                                  <strong style="color: #4b5563;">${label}:</strong> 
+                                  <span style="color: ${isStatus ? statusColor : '#111827'}; font-weight: ${isStatus ? 'bold' : '500'};">
+                                    ${value}
+                                  </span>
+                                </p>`;
+                            }
+                            return `<p style="margin: 10px 0; color: #4b5563; font-size: 15px;">${line}</p>`;
+                          }).join('')}
+                        </td>
+                      </tr>
+                    </table>
 
-          <!-- Highlight Box -->
-          <div style="margin-top: 30px; padding: 20px; background: linear-gradient(to right, #fff7ed, #ffffff); border-radius: 12px; border-left: 5px solid #f97316;">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="vertical-align: top; padding-right: 15px;">
-                  <span style="font-size: 24px;">ℹ️</span>
-                </td>
-                <td>
-                  <p style="margin: 0; color: #7c2d12; font-size: 14px; font-weight: 600;">Important Note</p>
-                  <p style="margin: 4px 0 0; color: #9a3412; font-size: 13px; line-height: 1.4;">
-                    This attendance record has been automatically synchronized with the central database on 
-                    <strong>${new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </div>
-          
-          <div style="text-align: center; margin-top: 35px;">
-            <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: white; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);">
-              View Dashboard
-            </a>
-          </div>
-        </div>
+                    <p style="color: #4b5563; font-size: 15px; margin: 25px 0; line-height: 1.5;">
+                      If there is any valid reason for the absence, please inform the school authority.
+                    </p>
 
-        <!-- Footer -->
-        <div style="background-color: #fff7ed; padding: 25px; text-align: center; border-top: 1px solid #ffedd5;">
-          <p style="margin: 0; color: #9a3412; font-size: 12px; font-weight: 600;">&copy; ${new Date().getFullYear()} Attendance Pro Team</p>
-          <div style="margin-top: 10px;">
-            <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Privacy Policy</span>
-            <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Support Center</span>
-          </div>
-          <p style="margin: 15px 0 0; color: #ea580c; font-size: 10px; opacity: 0.7; font-style: italic;">
-            This is a system-generated notification. Please do not reply directly to this email.
-          </p>
-        </div>
-      </div>
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="color: #4b5563; font-size: 16px;">
+                          Regards,<br>
+                          <strong style="color: #111827;">Attendance Pro Team</strong>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Button -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 35px;">
+                      <tr>
+                        <td align="center">
+                          <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: #ffffff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block;">
+                            View Dashboard
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td align="center" bgcolor="#fff7ed" style="padding: 25px; border-top: 1px solid #ffedd5;">
+                    <p style="margin: 0; color: #9a3412; font-size: 12px; font-weight: bold;">&copy; ${new Date().getFullYear()} Attendance Pro. All rights reserved.</p>
+                    <p style="margin: 10px 0 0; color: #ea580c; font-size: 11px; opacity: 0.8;">
+                      This is an automated message, please do not reply.
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
     `;
 
     const info = await transporter.sendMail({
