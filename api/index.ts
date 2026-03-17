@@ -50,27 +50,71 @@ app.post("/api/send-email", async (req, res) => {
       },
     });
 
-    // Beautiful HTML Email Template
+    // Vibrant Orange HTML Email Template
     const htmlTemplate = `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;">
-        <div style="background-color: #4f46e5; padding: 20px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Attendance Pro</h1>
+      <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #fed7aa;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
+          <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: inline-block; line-height: 60px; margin-bottom: 10px;">
+            <span style="font-size: 30px;">📅</span>
+          </div>
+          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Attendance Pro</h1>
+          <p style="color: #ffedd5; margin: 5px 0 0; font-size: 14px; opacity: 0.9;">Smart Attendance Management System</p>
         </div>
-        <div style="padding: 30px; background-color: #ffffff;">
-          <h2 style="color: #1f2937; margin-top: 0;">Attendance Notification</h2>
-          <p style="color: #4b5563; line-height: 1.6; font-size: 16px;">
-            ${text.replace(/\n/g, '<br>')}
-          </p>
-          <div style="margin-top: 30px; padding: 20px; background-color: #f9fafb; border-radius: 8px; border-left: 4px solid #4f46e5;">
-            <p style="margin: 0; color: #6b7280; font-size: 14px;">
-              <strong>Date:</strong> ${new Date().toLocaleDateString('en-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}<br>
-              <strong>Status:</strong> Notification Sent Successfully
-            </p>
+
+        <!-- Content Body -->
+        <div style="padding: 40px 30px; background-color: #ffffff;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <span style="background-color: #fff7ed; color: #c2410c; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid #ffedd5;">
+              New Notification
+            </span>
+          </div>
+
+          <div style="color: #374151; line-height: 1.8; font-size: 16px; background: #fffaf5; padding: 25px; border-radius: 12px; border: 1px dashed #fdba74;">
+            ${text.split('\n').map(line => {
+              if (line.includes(':')) {
+                const [label, value] = line.split(':');
+                return `<p style="margin: 8px 0;"><strong style="color: #ea580c;">${label}:</strong> <span style="color: #111827; font-weight: 500;">${value}</span></p>`;
+              }
+              return `<p style="margin: 10px 0;">${line}</p>`;
+            }).join('')}
+          </div>
+
+          <!-- Highlight Box -->
+          <div style="margin-top: 30px; padding: 20px; background: linear-gradient(to right, #fff7ed, #ffffff); border-radius: 12px; border-left: 5px solid #f97316;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="vertical-align: top; padding-right: 15px;">
+                  <span style="font-size: 24px;">ℹ️</span>
+                </td>
+                <td>
+                  <p style="margin: 0; color: #7c2d12; font-size: 14px; font-weight: 600;">Important Note</p>
+                  <p style="margin: 4px 0 0; color: #9a3412; font-size: 13px; line-height: 1.4;">
+                    This attendance record has been automatically synchronized with the central database on 
+                    <strong>${new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="text-align: center; margin-top: 35px;">
+            <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: white; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);">
+              View Dashboard
+            </a>
           </div>
         </div>
-        <div style="background-color: #f3f4f6; padding: 15px; text-align: center; font-size: 12px; color: #9ca3af;">
-          <p style="margin: 0;">&copy; ${new Date().getFullYear()} Attendance Pro. All rights reserved.</p>
-          <p style="margin: 5px 0 0;">This is an automated message, please do not reply.</p>
+
+        <!-- Footer -->
+        <div style="background-color: #fff7ed; padding: 25px; text-align: center; border-top: 1px solid #ffedd5;">
+          <p style="margin: 0; color: #9a3412; font-size: 12px; font-weight: 600;">&copy; ${new Date().getFullYear()} Attendance Pro Team</p>
+          <div style="margin-top: 10px;">
+            <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Privacy Policy</span>
+            <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Support Center</span>
+          </div>
+          <p style="margin: 15px 0 0; color: #ea580c; font-size: 10px; opacity: 0.7; font-style: italic;">
+            This is a system-generated notification. Please do not reply directly to this email.
+          </p>
         </div>
       </div>
     `;
