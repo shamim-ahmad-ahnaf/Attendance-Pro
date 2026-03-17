@@ -50,11 +50,37 @@ app.post("/api/send-email", async (req, res) => {
       },
     });
 
+    // Beautiful HTML Email Template
+    const htmlTemplate = `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;">
+        <div style="background-color: #4f46e5; padding: 20px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Attendance Pro</h1>
+        </div>
+        <div style="padding: 30px; background-color: #ffffff;">
+          <h2 style="color: #1f2937; margin-top: 0;">Attendance Notification</h2>
+          <p style="color: #4b5563; line-height: 1.6; font-size: 16px;">
+            ${text.replace(/\n/g, '<br>')}
+          </p>
+          <div style="margin-top: 30px; padding: 20px; background-color: #f9fafb; border-radius: 8px; border-left: 4px solid #4f46e5;">
+            <p style="margin: 0; color: #6b7280; font-size: 14px;">
+              <strong>Date:</strong> ${new Date().toLocaleDateString('en-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}<br>
+              <strong>Status:</strong> Notification Sent Successfully
+            </p>
+          </div>
+        </div>
+        <div style="background-color: #f3f4f6; padding: 15px; text-align: center; font-size: 12px; color: #9ca3af;">
+          <p style="margin: 0;">&copy; ${new Date().getFullYear()} Attendance Pro. All rights reserved.</p>
+          <p style="margin: 5px 0 0;">This is an automated message, please do not reply.</p>
+        </div>
+      </div>
+    `;
+
     const info = await transporter.sendMail({
       from: `"Attendance Pro" <${process.env.SMTP_USER}>`,
       to,
-      subject,
-      text,
+      subject: `🔔 ${subject}`,
+      text, // Fallback plain text
+      html: htmlTemplate, // Beautiful HTML version
     });
 
     res.json({ success: true, messageId: info.messageId });
