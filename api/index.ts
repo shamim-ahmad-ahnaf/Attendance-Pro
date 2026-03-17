@@ -50,7 +50,7 @@ app.post("/api/send-email", async (req, res) => {
       },
     });
 
-    // Table-based HTML Email Template for Maximum Compatibility
+    // Table-based HTML Email Template - Exactly matching user's screenshot layout
     const htmlTemplate = `
       <!DOCTYPE html>
       <html>
@@ -59,31 +59,44 @@ app.post("/api/send-email", async (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Attendance Notification</title>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Helvetica, Arial, sans-serif;">
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
         <table border="0" cellpadding="0" cellspacing="0" width="100%">
           <tr>
             <td align="center" style="padding: 20px 0;">
-              <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #fed7aa; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+              <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #fed7aa; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 
-                <!-- Header -->
+                <!-- Header (Orange Theme) -->
                 <tr>
-                  <td align="center" bgcolor="#f97316" style="padding: 30px 20px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
-                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;">Attendance Pro</h1>
-                    <p style="color: #ffedd5; margin: 5px 0 0; font-size: 14px;">Smart Attendance Management System</p>
+                  <td align="center" bgcolor="#f97316" style="padding: 25px 20px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: bold;">Attendance Pro</h1>
+                    <p style="color: #ffedd5; margin: 5px 0 0; font-size: 13px; opacity: 0.9;">Smart Attendance Management System</p>
                   </td>
                 </tr>
 
-                <!-- Body -->
+                <!-- Main Content -->
                 <tr>
-                  <td style="padding: 40px 30px;">
-                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 22px;">Attendance Notification</h2>
+                  <td style="padding: 40px 35px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px; font-weight: 700;">Attendance Notification</h2>
+                    
                     <p style="color: #374151; font-size: 16px; margin: 0 0 15px 0;">Dear Parent,</p>
+                    
                     <p style="color: #374151; line-height: 1.6; font-size: 16px; margin: 0 0 25px 0;">
-                      This is to inform you that your child has an attendance update. Please review the details below.
+                      ${(() => {
+                        // Extracting data for the main paragraph to match screenshot
+                        const lines = text.split('\n');
+                        let student = "your child";
+                        let status = "updated";
+                        lines.forEach(l => {
+                          if (l.toLowerCase().includes('student:')) student = l.split(':')[1].trim();
+                          if (l.toLowerCase().includes('status:')) status = l.split(':')[1].trim();
+                        });
+                        const statusColor = status.toLowerCase() === 'absent' ? '#ef4444' : '#10b981';
+                        return `This is to inform you that your child <strong style="color: #111827;">${student}</strong> was marked <strong style="color: ${statusColor}; text-transform: uppercase;">${status}</strong> today (${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}).`;
+                      })()}
                     </p>
 
-                    <!-- Info Box -->
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff7ed; border-radius: 8px; border-left: 5px solid #f97316;">
+                    <!-- Info Box (Blue/Gray background with Orange Left Border) -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; border-left: 5px solid #f97316; margin-bottom: 25px;">
                       <tr>
                         <td style="padding: 20px;">
                           ${text.split('\n').map(line => {
@@ -92,28 +105,28 @@ app.post("/api/send-email", async (req, res) => {
                               const isStatus = label.trim().toLowerCase() === 'status';
                               const statusColor = value.trim().toLowerCase() === 'absent' ? '#ef4444' : '#10b981';
                               return `
-                                <p style="margin: 8px 0; font-size: 15px; color: #4b5563;">
-                                  <strong style="color: #4b5563;">${label}:</strong> 
-                                  <span style="color: ${isStatus ? statusColor : '#111827'}; font-weight: ${isStatus ? 'bold' : '500'};">
+                                <p style="margin: 6px 0; font-size: 15px; color: #4b5563;">
+                                  <strong style="color: #334155;">${label}:</strong> 
+                                  <span style="color: ${isStatus ? statusColor : '#1e293b'}; font-weight: ${isStatus ? 'bold' : '500'};">
                                     ${value}
                                   </span>
                                 </p>`;
                             }
-                            return `<p style="margin: 10px 0; color: #4b5563; font-size: 15px;">${line}</p>`;
+                            return `<p style="margin: 8px 0; color: #4b5563; font-size: 15px;">${line}</p>`;
                           }).join('')}
                         </td>
                       </tr>
                     </table>
 
-                    <p style="color: #4b5563; font-size: 15px; margin: 25px 0; line-height: 1.5;">
+                    <p style="color: #475569; font-size: 15px; margin: 0 0 25px 0; line-height: 1.5;">
                       If there is any valid reason for the absence, please inform the school authority.
                     </p>
 
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td style="color: #4b5563; font-size: 16px;">
+                        <td style="color: #475569; font-size: 16px;">
                           Regards,<br>
-                          <strong style="color: #111827;">Attendance Pro Team</strong>
+                          <strong style="color: #1e293b; display: inline-block; margin-top: 5px;">Attendance Pro Team</strong>
                         </td>
                       </tr>
                     </table>
@@ -122,7 +135,7 @@ app.post("/api/send-email", async (req, res) => {
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 35px;">
                       <tr>
                         <td align="center">
-                          <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: #ffffff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block;">
+                          <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: #ffffff; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);">
                             View Dashboard
                           </a>
                         </td>
@@ -133,9 +146,9 @@ app.post("/api/send-email", async (req, res) => {
 
                 <!-- Footer -->
                 <tr>
-                  <td align="center" bgcolor="#fff7ed" style="padding: 25px; border-top: 1px solid #ffedd5;">
-                    <p style="margin: 0; color: #9a3412; font-size: 12px; font-weight: bold;">&copy; ${new Date().getFullYear()} Attendance Pro. All rights reserved.</p>
-                    <p style="margin: 10px 0 0; color: #ea580c; font-size: 11px; opacity: 0.8;">
+                  <td align="center" bgcolor="#f8fafc" style="padding: 25px; border-top: 1px solid #f1f5f9;">
+                    <p style="margin: 0; color: #64748b; font-size: 12px;">&copy; ${new Date().getFullYear()} Attendance Pro. All rights reserved.</p>
+                    <p style="margin: 8px 0 0; color: #94a3b8; font-size: 11px;">
                       This is an automated message, please do not reply.
                     </p>
                   </td>
