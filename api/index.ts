@@ -22,7 +22,7 @@ app.get("/api/email-status", (req, res) => {
 
 // Email API Route
 app.post("/api/send-email", async (req, res) => {
-  const { to, subject, text } = req.body;
+  const { to, subject, text, summary } = req.body;
 
   if (!to || !subject || !text) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -46,69 +46,83 @@ app.post("/api/send-email", async (req, res) => {
       },
     });
 
-    // Vibrant Orange HTML Email Template
+    // রিয়েল তারিখ
+    const today = new Date();
+    const day = today.toLocaleDateString('en-BD', { weekday: 'short' });
+    const date = today.getDate();
+    const month = today.toLocaleDateString('en-BD', { month: 'short' });
+    const year = today.getFullYear();
+
+    // Vibrant Orange HTML Email Template with Summary
     const htmlTemplate = `
-      <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #fed7aa;">
-        
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
-          <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: inline-block; line-height: 60px; margin-bottom: 10px;">
-            <span style="font-size: 30px;">📅</span>
-          </div>
-          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Attendance Pro</h1>
-          <p style="color: #ffedd5; margin: 5px 0 0; font-size: 14px; opacity: 0.9;">Smart Attendance Management System</p>
-        </div>
-
-        <!-- Content Body -->
-        <div style="padding: 40px 30px; background-color: #ffffff;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <span style="background-color: #fff7ed; color: #c2410c; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid #ffedd5;">New Notification</span>
-          </div>
-
-          <div style="color: #374151; line-height: 1.8; font-size: 16px; background: #fffaf5; padding: 25px; border-radius: 12px; border: 1px dashed #fdba74;">
-            ${text.split('\n').map(line => {
-              if (line.includes(':')) {
-                const [label, value] = line.split(':');
-                return `<p style="margin: 8px 0;"><strong style="color: #ea580c;">${label.trim()}:</strong> <span style="color: #111827; font-weight: 500;">${value.trim()}</span></p>`;
-              }
-              return `<p style="margin: 10px 0;">${line}</p>`;
-            }).join('')}
-          </div>
-
-          <!-- Highlight Box -->
-          <div style="margin-top: 30px; padding: 20px; background: linear-gradient(to right, #fff7ed, #ffffff); border-radius: 12px; border-left: 5px solid #f97316;">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="vertical-align: top; padding-right: 15px;">
-                  <span style="font-size: 24px;">ℹ️</span>
-                </td>
-                <td>
-                  <p style="margin: 0; color: #7c2d12; font-size: 14px; font-weight: 600;">Important Note</p>
-                  <p style="margin: 4px 0 0; color: #9a3412; font-size: 13px; line-height: 1.4;">
-                    This attendance record has been automatically synchronized with the central database on <strong>${new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <div style="text-align: center; margin-top: 35px;">
-            <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: white; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);">View Dashboard</a>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div style="background-color: #fff7ed; padding: 25px; text-align: center; border-top: 1px solid #ffedd5;">
-          <p style="margin: 0; color: #9a3412; font-size: 12px; font-weight: 600;">&copy; ${new Date().getFullYear()} Attendance Pro Team</p>
-          <div style="margin-top: 10px;">
-            <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Privacy Policy</span>
-            <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Support Center</span>
-          </div>
-          <p style="margin: 15px 0 0; color: #ea580c; font-size: 10px; opacity: 0.7; font-style: italic;">This is a system-generated notification. Please do not reply directly to this email.</p>
-        </div>
+<div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #fed7aa;">
+  
+  <!-- Header -->
+  <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
+    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 10px;">
+      <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px;">📅</div>
+      <div style="color: white; font-weight: 700; font-size: 16px;">
+        ${day}, ${date} ${month} ${year}
       </div>
-    `;
+    </div>
+    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Attendance Pro</h1>
+    <p style="color: #ffedd5; margin: 5px 0 0; font-size: 14px; opacity: 0.9;">Smart Attendance Management System</p>
+  </div>
 
+  <!-- Content Body -->
+  <div style="padding: 40px 30px; background-color: #ffffff;">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <span style="background-color: #fff7ed; color: #c2410c; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid #ffedd5;">New Notification</span>
+    </div>
+
+    <!-- Message Box -->
+    <div style="color: #374151; line-height: 1.8; font-size: 16px; background: #fffaf5; padding: 25px; border-radius: 12px; border: 1px dashed #fdba74;">
+      ${text.split('\n').map(line => {
+        if (line.includes(':')) {
+          const [label, value] = line.split(':');
+          return `<p style="margin: 8px 0;"><strong style="color: #ea580c;">${label.trim()}:</strong> <span style="color: #111827; font-weight: 500;">${value.trim()}</span></p>`;
+        }
+        return `<p style="margin: 10px 0;">${line}</p>`;
+      }).join('')}
+    </div>
+
+    <!-- Summary Box -->
+    <div style="margin-top: 25px; padding: 20px; background: #fff7ed; border-radius: 12px; border-left: 5px solid #f97316;">
+      <p style="margin: 0 0 5px; font-weight: 600; color: #7c2d12;">📊 Attendance Summary</p>
+      <table width="100%" style="font-size: 14px; color: #9a3412; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 6px 0;">Total Present</td>
+          <td style="padding: 6px 0; text-align: right;">${summary?.present || 0}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0;">Total Absent</td>
+          <td style="padding: 6px 0; text-align: right;">${summary?.absent || 0}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0;">Total Late</td>
+          <td style="padding: 6px 0; text-align: right;">${summary?.late || 0}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="text-align: center; margin-top: 35px;">
+      <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: white; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);">View Dashboard</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="background-color: #fff7ed; padding: 25px; text-align: center; border-top: 1px solid #ffedd5;">
+    <p style="margin: 0; color: #9a3412; font-size: 12px; font-weight: 600;">&copy; ${year} Attendance Pro Team</p>
+    <div style="margin-top: 10px;">
+      <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Privacy Policy</span>
+      <span style="color: #c2410c; font-size: 11px; text-decoration: none; margin: 0 10px;">Support Center</span>
+    </div>
+    <p style="margin: 15px 0 0; color: #ea580c; font-size: 10px; opacity: 0.7; font-style: italic;">This is a system-generated notification. Please do not reply directly to this email.</p>
+  </div>
+</div>
+`;
+
+    // Send Email
     const info = await transporter.sendMail({
       from: `"Attendance Pro" <${process.env.SMTP_USER}>`,
       to,
@@ -118,6 +132,7 @@ app.post("/api/send-email", async (req, res) => {
     });
 
     res.json({ success: true, messageId: info.messageId });
+
   } catch (error: any) {
     res.status(500).json({ error: error.message || "Failed to send email" });
   }
