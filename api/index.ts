@@ -55,48 +55,80 @@ app.post("/api/send-email", async (req, res) => {
       <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #fed7aa;">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
-          <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: inline-block; line-height: 60px; margin-bottom: 10px;">
-            <span style="font-size: 30px;">📅</span>
-          </div>
-          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Attendance Pro</h1>
-          <p style="color: #ffedd5; margin: 5px 0 0; font-size: 14px; opacity: 0.9;">Smart Attendance Management System</p>
-        </div>
+  <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: inline-block; line-height: 60px; margin-bottom: 10px;">
+    <span style="font-size: 30px;">📅</span>
+  </div>
 
-        <!-- Content Body -->
-        <div style="padding: 40px 30px; background-color: #ffffff;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <span style="background-color: #fff7ed; color: #c2410c; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid #ffedd5;">
-              New Notification
-            </span>
-          </div>
+  <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">
+    Attendance Pro
+  </h1>
 
-          <div style="color: #374151; line-height: 1.8; font-size: 16px; background: #fffaf5; padding: 25px; border-radius: 12px; border: 1px dashed #fdba74;">
-            ${text.split('\n').map(line => {
-              if (line.includes(':')) {
-                const [label, value] = line.split(':');
-                return `<p style="margin: 8px 0;"><strong style="color: #ea580c;">${label}:</strong> <span style="color: #111827; font-weight: 500;">${value}</span></p>`;
-              }
-              return `<p style="margin: 10px 0;">${line}</p>`;
-            }).join('')}
-          </div>
+  <p style="color: #ffedd5; margin: 6px 0 0; font-size: 14px;">
+    Smart Attendance Management System
+  </p>
+</div>
 
-          <!-- Highlight Box -->
-          <div style="margin-top: 30px; padding: 20px; background: linear-gradient(to right, #fff7ed, #ffffff); border-radius: 12px; border-left: 5px solid #f97316;">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="vertical-align: top; padding-right: 15px;">
-                  <span style="font-size: 24px;">ℹ️</span>
-                </td>
-                <td>
-                  <p style="margin: 0; color: #7c2d12; font-size: 14px; font-weight: 600;">Important Note</p>
-                  <p style="margin: 4px 0 0; color: #9a3412; font-size: 13px; line-height: 1.4;">
-                    This attendance record has been automatically synchronized with the central database on 
-                    <strong>${new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </div>
+<!-- Content Body -->
+<div style="padding: 40px 30px; background-color: #ffffff;">
+
+  <!-- Notification Label -->
+  <div style="text-align: center; margin-bottom: 30px;">
+    <span style="background-color: #fff7ed; color: #c2410c; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid #ffedd5;">
+      Attendance Notification
+    </span>
+  </div>
+
+  <!-- Intro Text -->
+  <p style="font-size:16px; color:#374151; margin-bottom:15px;">
+    Dear Parent,
+  </p>
+
+  <p style="font-size:15px; color:#374151; line-height:1.7;">
+    We would like to inform you that there has been an update regarding your child's attendance. 
+    Please review the details below.
+  </p>
+
+  <!-- Student Info Box -->
+  <div style="color: #374151; line-height: 1.8; font-size: 16px; background: #fffaf5; padding: 25px; border-radius: 12px; border: 1px dashed #fdba74; margin-top:20px;">
+    ${text.split('\n').map(line => {
+      if (line.includes(':')) {
+        const [label, value] = line.split(':');
+        return `<p style="margin: 8px 0;">
+          <strong style="color: #ea580c;">${label}:</strong>
+          <span style="color: #111827; font-weight: 500;"> ${value}</span>
+        </p>`;
+      }
+      return `<p style="margin: 10px 0;">${line}</p>`;
+    }).join('')}
+  </div>
+
+  <!-- Highlight Box -->
+  <div style="margin-top: 30px; padding: 20px; background: linear-gradient(to right, #fff7ed, #ffffff); border-radius: 12px; border-left: 5px solid #f97316;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="vertical-align: top; padding-right: 15px;">
+          <span style="font-size: 24px;">ℹ️</span>
+        </td>
+        <td>
+          <p style="margin: 0; color: #7c2d12; font-size: 14px; font-weight: 600;">
+            Important Notice
+          </p>
+          <p style="margin: 5px 0 0; color: #9a3412; font-size: 13px; line-height: 1.5;">
+            This attendance information has been automatically recorded in our system on 
+            <strong>
+              ${new Date().toLocaleDateString('en-BD', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+              })}
+            </strong>.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</div>
           
           <div style="text-align: center; margin-top: 35px;">
             <a href="${process.env.APP_URL || '#'}" style="background-color: #f97316; color: white; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);">
