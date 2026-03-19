@@ -52,26 +52,51 @@ app.post("/api/send-email", async (req, res) => {
       <!-- Header -->
       <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
   
-  <div style="background: rgba(255,255,255,0.2); width: 70px; height: 70px; border-radius: 50%; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px;">
-    
-    <span style="font-size: 22px;">📅</span>
-    
-    <span style="font-size: 11px; color: white; font-weight: 600;">
-      ${new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
-    </span>
+  <div style="margin-top:20px; background: linear-gradient(135deg, #fffaf5, #ffffff); padding: 25px; border-radius: 14px; border: 1px solid #fed7aa;">
 
-  </div>
+  ${text.split('\n').map(line => {
 
-  <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800;">
-    Attendance Pro
-  </h1>
+    if (line.toLowerCase().includes("status")) {
+      const [label, value] = line.split(':');
 
-  <p style="color: #ffedd5; margin-top: 6px; font-size: 14px;">
-    Smart Attendance Management System
-  </p>
+      let color = "#374151";
+      let bg = "#f3f4f6";
+
+      if (value.toLowerCase().includes("absent")) {
+        color = "#b91c1c";
+        bg = "#fee2e2";
+      } else if (value.toLowerCase().includes("late")) {
+        color = "#c2410c";
+        bg = "#ffedd5";
+      } else if (value.toLowerCase().includes("present")) {
+        color = "#166534";
+        bg = "#dcfce7";
+      }
+
+      return `
+      <div style="margin:10px 0; padding:12px; border-radius:10px; background:${bg};">
+        <strong style="color:#ea580c;">${label}:</strong>
+        <span style="color:${color}; font-weight:bold; margin-left:5px;">
+          ${value}
+        </span>
+      </div>`;
+    }
+
+    if (line.includes(':')) {
+      const [label, value] = line.split(':');
+
+      return `
+      <div style="margin:8px 0; padding:10px 12px; background:#fff7ed; border-radius:8px;">
+        <strong style="color:#ea580c;">${label}:</strong>
+        <span style="color:#111827; font-weight:500;"> ${value}</span>
+      </div>`;
+    }
+
+    return `<p style="margin:10px 0; color:#374151;">${line}</p>`;
+
+  }).join('')}
 
 </div>
-
       <!-- Body -->
       <div style="padding:40px 30px;background:#ffffff;">
 
