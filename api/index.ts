@@ -50,22 +50,27 @@ app.post("/api/send-email", async (req, res) => {
     <div style="font-family:'Segoe UI',Roboto,Arial,sans-serif;max-width:600px;margin:auto;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.1);border:1px solid #fed7aa;">
 
       <!-- Header -->
-      <div style="background:linear-gradient(135deg,#f97316,#ea580c);padding:30px 20px;text-align:center;">
+      <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
+  
+  <div style="background: rgba(255,255,255,0.2); width: 70px; height: 70px; border-radius: 50%; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px;">
+    
+    <span style="font-size: 22px;">📅</span>
+    
+    <span style="font-size: 11px; color: white; font-weight: 600;">
+      ${new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+    </span>
 
-        <!-- Dynamic Date Circle -->
-        <div style="background:rgba(255,255,255,0.2);width:60px;height:60px;border-radius:50%;display:inline-block;margin-bottom:10px;text-align:center;padding-top:8px;">
-          <div style="color:white;font-size:18px;font-weight:bold;">${day}</div>
-          <div style="color:white;font-size:10px;">${month}</div>
-        </div>
+  </div>
 
-        <h1 style="color:white;margin:0;font-size:28px;font-weight:800;">
-          Attendance Pro
-        </h1>
+  <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800;">
+    Attendance Pro
+  </h1>
 
-        <p style="color:#ffedd5;margin-top:6px;font-size:14px;">
-          Smart Attendance Management System
-        </p>
-      </div>
+  <p style="color: #ffedd5; margin-top: 6px; font-size: 14px;">
+    Smart Attendance Management System
+  </p>
+
+</div>
 
       <!-- Body -->
       <div style="padding:40px 30px;background:#ffffff;">
@@ -84,22 +89,27 @@ app.post("/api/send-email", async (req, res) => {
         </p>
 
         <!-- Info Box -->
-        <div style="color:#374151;line-height:1.8;font-size:16px;background:#fffaf5;padding:25px;border-radius:12px;border:1px dashed #fdba74;margin-top:20px;">
-          ${text
-            .split("\n")
-            .map((line) => {
-              if (line.includes(":")) {
-                const [label, value] = line.split(":");
-                return `
-                <p style="margin:8px 0;">
-                  <strong style="color:#ea580c;">${label}:</strong>
-                  <span style="color:#111827;font-weight:500;"> ${value}</span>
-                </p>`;
-              }
-              return `<p style="margin:10px 0;">${line}</p>`;
-            })
-            .join("")}
-        </div>
+       <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px 20px; text-align: center;">
+  
+  <div style="background: rgba(255,255,255,0.2); width: 70px; height: 70px; border-radius: 50%; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px;">
+    
+    <span style="font-size: 22px;">📅</span>
+    
+    <span style="font-size: 11px; color: white; font-weight: 600;">
+      ${new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+    </span>
+
+  </div>
+
+  <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800;">
+    Attendance Pro
+  </h1>
+
+  <p style="color: #ffedd5; margin-top: 6px; font-size: 14px;">
+    Smart Attendance Management System
+  </p>
+
+</div>
 
         <!-- Highlight -->
         <div style="margin-top:30px;padding:20px;background:linear-gradient(to right,#fff7ed,#ffffff);border-radius:12px;border-left:5px solid #f97316;">
